@@ -1,0 +1,13 @@
+# Dependências (são reinstaladas com npm install)
+node_modules/
+
+# Segredos: NUNCA vão para o GitHub
+.env
+.env.*
+!.env.example
+
+# Arquivos gerados / do sistema
+coverage/
+*.log
+.DS_Store
+Thumbs.db

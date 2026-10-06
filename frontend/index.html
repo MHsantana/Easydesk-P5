@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EasyDesk - Mario Santana</title>
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content="Easydesk." />
+    <link rel="icon" href="assets/img/favicon.jpg" />
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Barra de carregamento: aparece enquanto o app espera respostas do servidor -->
+    <div class="loading-bar" id="loading-bar" aria-hidden="true"></div>
+
+    <!-- Mensagens rápidas (erros e confirmações) -->
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+    <!-- TELA DE LOGIN / CADASTRO -->
+    <section class="auth-screen hidden" id="auth-screen">
+      <div class="auth-card">
+        <h1>EasyDesk</h1>
+        <p class="auth-subtitle">Painel de Chamados</p>
+
+        <div class="auth-tabs" role="tablist">
+          <button type="button" class="auth-tab active" data-tab="login">Entrar</button>
+          <button type="button" class="auth-tab" data-tab="register">Criar conta</button>
+        </div>
+
+        <form id="login-form" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="login-email">E-mail</label>
+            <input type="email" id="login-email" autocomplete="email" maxlength="254" />
+          </div>
+          <div class="form-group">
+            <label for="login-password">Senha</label>
+            <input type="password" id="login-password" autocomplete="current-password" maxlength="200" />
+          </div>
+          <p class="auth-error" role="alert"></p>
+          <button type="submit" class="primary-btn">Entrar</button>
+        </form>
+
+        <form id="register-form" class="auth-form hidden" novalidate>
+          <div class="form-group">
+            <label for="register-name">Nome</label>
+            <input type="text" id="register-name" autocomplete="name" maxlength="64" />
+          </div>
+          <div class="form-group">
+            <label for="register-email">E-mail</label>
+            <input type="email" id="register-email" autocomplete="email" maxlength="254" />
+          </div>
+          <div class="form-group">
+            <label for="register-password">Senha (mínimo 8 caracteres)</label>
+            <input type="password" id="register-password" autocomplete="new-password" maxlength="72" />
+          </div>
+          <div class="form-group">
+            <label for="register-password-confirm">Confirme a senha</label>
+            <input type="password" id="register-password-confirm" autocomplete="new-password" maxlength="72" />
+          </div>
+          <p class="auth-error" role="alert"></p>
+          <button type="submit" class="primary-btn">Criar conta</button>
+        </form>
+      </div>
+    </section>
+
+    <main class="app hidden">
+      <header class="topbar">
+        <h1>EasyDesk - Painel de Chamados</h1>
+
+        <div class="topbar-actions">
+          <button class="primary-btn new-ticket-btn" id="new-ticket-btn">Novo Chamado</button>
+          <button class="secondary-btn" id="new-group-btn">Novo Grupo</button>
+          <select id="group-select">
+            <option value="all">Todos</option>
+          </select>
+          <div class="user-menu">
+            <span class="user-name" id="user-name"></span>
+            <button class="secondary-btn" id="logout-btn">Sair</button>
+          </div>
+        </div>
+      </header>
+
+      <section class="toolbar">
+        <div class="toolbar-left">
+          <input
+            class="ticket-search"
+            type="text"
+            placeholder="Buscar chamado..."
+          />
+          <select class="status-filter">
+            <option value="Todos">Todos</option>
+            <option value="Ativos">Ativos</option>
+            <option value="Finalizados">Finalizados</option>
+            <option value="Pendente">Pendente</option>
+            <option value="Em Progresso">Em Progresso</option>
+            <option value="Pausado">Pausado</option>
+            <option value="Concluído">Concluído</option>
+            <option value="Cancelado">Cancelado</option>
+          </select>
+        </div>
+
+        <div class="toolbar-center">
+          <select id="sort-tickets">
+            <option value="newest">Mais novo</option>
+            <option value="oldest">Mais antigo</option>
+            <option value="priority">Criticidade</option>
+          </select>
+          <button id="toggle-all-tickets">
+            Expandir todos
+          </button>
+        </div>
+
+        <div class="toolbar-right">
+          <div class="view-switcher">
+            <button class="view-btn active">Chamados</button>
+            <button class="view-btn">Grupos</button>
+          </div>
+        </div>
+      </section>
+      <!-- ÁREA DINÂMICA PRINCIPAL -->
+      <section class="content">
+        <!-- VIEW DE CHAMADOS -->
+        <section class="tickets-view">
+          <div class="tickets-list">
+            <!-- cards de chamados aparecerão aqui -->
+          </div>
+        </section>
+
+        <!-- VIEW DE GRUPOS -->
+        <section class="groups-view hidden">
+          <section class="groups-list">
+            <!-- cards de grupos aparecerão aqui -->
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <div class="modal hidden" id="group-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Novo Grupo</h2>
+          <button class="close-modal">X</button>
+        </div>
+        <form id="group-form">
+          <div class="form-group">
+            <label> Nome do Grupo </label>
+            <input
+              type="text"
+              id="group-name"
+              placeholder="Exemplo: Infraestrutura"
+              maxlength="64"
+            />
+          </div>
+          <div class="form-group">
+            <label> Prefixo </label>
+            <input
+              type="text"
+              id="group-prefix"
+              placeholder="Exemplo: INF"
+              maxlength="5"
+            />
+          </div>
+          <button type="submit" class="primary-btn new-ticket-btn">
+            Criar Grupo
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal hidden" id="ticket-modal">
+      <div class="modal-content ticket-modal-content">
+        <div class="modal-header">
+          <h2>Novo Chamado</h2>
+          <button class="close-ticket-modal">X</button>
+        </div>
+        <form id="ticket-form">
+          <div class="form-group">
+            <label> Grupo </label>
+            <select id="ticket-group"></select>
+          </div>
+          <div class="form-group">
+            <label> Título </label>
+            <input type="text" id="ticket-title" maxlength="64" />
+            <small class="char-counter" data-for="ticket-title"> 0 / 64 </small>
+          </div>
+          <div class="form-group">
+            <label> Nome </label>
+            <input type="text" id="ticket-requester" maxlength="64" />
+            <small class="char-counter" data-for="ticket-requester">
+              0 / 64
+            </small>
+          </div>
+          <div class="form-group">
+            <label> Data </label>
+            <input type="date" id="ticket-date" />
+          </div>
+          <div class="form-group">
+            <label> Descrição </label>
+            <textarea id="ticket-description" maxlength="4000"></textarea>
+            <small class="char-counter" data-for="ticket-description">
+              0 / 4000
+            </small>
+          </div>
+          <div class="form-group">
+            <label> Responsável </label>
+            <input type="text" id="ticket-owner" maxlength="64" />
+          </div>
+          <div class="form-group">
+            <label> Criticidade </label>
+            <select id="ticket-priority">
+              <option value="">Selecione</option>
+              <option>Baixa</option>
+              <option>Média</option>
+              <option>Alta</option>
+              <option>Crítica</option>
+            </select>
+          </div>
+          <button type="submit" class="primary-btn new-ticket-btn">
+            Criar Chamado
+          </button>
+        </form>
+      </div>
+    </div>
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
