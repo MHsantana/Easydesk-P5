@@ -4,7 +4,7 @@
 // - publicado na internet, usa o endereço do backend publicado.
 // Depois do deploy, troque PRODUCTION_API_URL pelo endereço do seu backend no Render.
 (function () {
-  const PRODUCTION_API_URL = "https://SEU-BACKEND.onrender.com";
+  const PRODUCTION_API_URL = "https://easydesk-api-mqop.onrender.com";
 
   const isLocal = ["localhost", "127.0.0.1", ""].includes(window.location.hostname);
 
